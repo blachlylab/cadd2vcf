@@ -24,6 +24,7 @@ struct CADDAnnoExtended
 	string length;
 	string annoType;
 	string Consequence;
+    int consScore;
 	string consDetail;
 	float GC;
 	float CpG;
@@ -108,6 +109,8 @@ struct CADDAnnoExtended
 	float EncodeH3K9me3max;
 	float EncodeH3K27acSum;
 	float EncodeH3K27acMax;
+    float EncodeH3K27me3Sum;
+    float EncodeH3K27me3Max;
 	float EncodeH3K36me3sum;
 	float EncodeH3K36me3max;
 	float EncodeH3K79me2sum;
@@ -277,20 +280,20 @@ AliasSeq!(
 	"CADD_MMSp_donor",
 	"CADD_MMSp_donorIntron",
 	"CADD_Dist2Mutation",
-	"CADD_Freq100bp ",
-	"CADD_Rare100bp ",
-	"CADD_Sngl100bp ",
-	"CADD_Freq1000bp ",
-	"CADD_Rare1000bp ",
-	"CADD_Sngl1000bp ",
-	"CADD_Freq10000bp ",
-	"CADD_Rare10000bp ",
-	"CADD_Sngl10000bp ",
+	"CADD_Freq100bp",
+	"CADD_Rare100bp",
+	"CADD_Sngl100bp",
+	"CADD_Freq1000bp",
+	"CADD_Rare1000bp",
+	"CADD_Sngl1000bp",
+	"CADD_Freq10000bp",
+	"CADD_Rare10000bp",
+	"CADD_Sngl10000bp",
 	"CADD_EnsembleRegulatoryFeature",
 	"CADD_dbscSNV-ada_score",
 	"CADD_dbscSNV-rf_score",
-	"CADD_RemapOverlapTF ",
-	"CADD_RemapOverlapCL ",
+	"CADD_RemapOverlapTF",
+	"CADD_RemapOverlapCL",
 	"CADD_RawScore",
 	"CADD_PHRED",
 );
