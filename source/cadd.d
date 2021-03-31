@@ -4,6 +4,9 @@ import std.conv: to, parse;
 import dhtslib.vcf;
 
 
+// So cadd has differrent column sets per version and reference
+// which is wholly breaking
+
 struct CADDAnno
 {
 	string chr;
@@ -247,6 +250,15 @@ struct CADDAnnoExtendedGRCH37
     float encOCctcfSig;
     float encOCmycSig;
     float grantham;
+    float SpliceAIAccGain;
+	float SpliceAIAccLoss;
+	float SpliceAIDonGain;
+	float SpliceAIDonLoss;
+	float MMSpAcceptorIntron;
+	float MMSpAcceptor;
+	float MMSpExon;
+	float MMSpDonor;
+	float MMSpDonorIntron;
     float dist2Mutation;
     int freq100bp;
     int rare100bp;
@@ -500,6 +512,15 @@ AliasSeq!(
     "CADD_EncOCctcfSig",
     "CADD_EncOCmycSig",
     "CADD_Grantham",
+    "CADD_SpliceAI-acc-gain",
+	"CADD_SpliceAI-acc-loss",
+	"CADD_SpliceAI-don-gain",
+	"CADD_SpliceAI-don-loss",
+	"CADD_MMSp_acceptorIntron",
+	"CADD_MMSp_acceptor",
+	"CADD_MMSp_exon",
+	"CADD_MMSp_donor",
+	"CADD_MMSp_donorIntron",
     "CADD_Dist2Mutation",
     "CADD_Freq100bp",
     "CADD_Rare100bp",
