@@ -326,7 +326,7 @@ AliasSeq!(
 	"Relative position in coding sequence (default: 0)",
 	"Amino acid position from coding start (default: 0*)",
 	"Relative position in protein codon (default: 0)",
-	"Domain annotation inferred from VEP annotation (ncoils, sigp,lcompl, hmmpanther, ndomain = \"other named domain\") (default:UD)",
+	"Domain annotation inferred from VEP annotation (ncoils, sigp,lcompl, hmmpanther, ndomain = \\\"other named domain\\\") (default:UD)",
 	"Distance to splice site in 20bp; positive: exonic, negative: intronic(default: 0)",
 	"Closest splice site is ACCEPTOR or DONOR (default: unknown)",
 	"Distance to closest Transcribed Sequence Start (TSS) (default:5.5)",
