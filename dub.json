@@ -1,0 +1,12 @@
+{
+	"authors": [
+		"Charles Gregory"
+	],
+	"copyright": "Copyright © 2021, Charles Gregory",
+	"dependencies": {
+		"dhtslib": "~>0.11.1"
+	},
+	"description": "Directly annotate vcf with cadd scores.",
+	"license": "MIT",
+	"name": "cadd2vcf"
+}
