@@ -9,89 +9,110 @@ import cadd;
 
 void main(string[] args)
 {
-	// open vcf readers and writer
-	auto vcfreader = VCFReader(args[1]);
-	auto vcfwriter = VCFWriter("-", vcfreader.vcfhdr);
-	auto caddfile = BGZFile(args[2]);
+    // open vcf readers and writer
+    auto vcfreader = VCFReader(args[1]);
+    auto vcfwriter = VCFWriter("-", vcfreader.vcfhdr);
+    auto caddfile = BGZFile(args[2]);
 
-	// add in new headers
-	addHeaderFields(vcfwriter);
-	vcfwriter.writeHeader;
+    // add in new headers
+    addHeaderFields(vcfwriter);
+    vcfwriter.writeHeader;
 
-	// prime caddline
-	auto caddline = caddfile.front;
+    // prime caddline
+    auto caddEmpty = caddfile.empty;
+    auto caddline = caddfile.front;
 
-	// check for UCSC/chr prefix in vcf
-	auto prefix = false;
-	foreach (contig; vcfreader.vcfhdr.sequences)
-	{
-		if(contig.startsWith("chr")){
-			prefix = true;
-			break;
-		}
-	}
+    // check for UCSC/chr prefix in vcf
+    auto prefix = false;
+    foreach (contig; vcfreader.vcfhdr.sequences)
+    {
+        if(contig.startsWith("chr")){
+            prefix = true;
+            break;
+        }
+    }
 
-	// skip comment lines in caddfile
-	while(caddline[0]=='#'){
-		caddfile.popFront;
-		caddline = caddfile.front;
-	}
+    // skip comment lines in caddfile
+    while(caddline[0]=='#'){
+        caddfile.popFront;
+        caddEmpty = caddfile.empty;
+        caddline = caddfile.front;
+    }
 
-	// loop
-	foreach (VCFRecord rec; vcfreader)
-	{
-		rec.vcfheader = vcfwriter.getHeader;
-		// if extra vcf records write and skip
-		if(caddfile.empty){
-			vcfwriter.writeRecord(rec);
-			continue;
-		}
+    // loop
+    foreach (VCFRecord rec; vcfreader)
+    {
+        rec.vcfheader = vcfwriter.getHeader;
+        // if extra vcf records write and skip
+        if(caddEmpty){
+            vcfwriter.writeRecord(rec);
+            continue;
+        }
 
 
-		auto caddfields = caddline.split("\t");
-		// not extended record
-		if(caddfields.length == 6){
-			// process caddline and fix prefix in cadd record
-			auto caddResult = processCADDLine!CADDAnno(caddfields);
-			if(prefix) caddResult.chr = "chr" ~ caddResult.chr; 
+        auto caddfields = caddline.split("\t");
+        // not extended record
+        if(caddfields.length == 6){
+            // process caddline and fix prefix in cadd record
+            auto caddResult = processCADDLine!CADDAnno(caddfields);
+            caddResult.pos--;
+            if(prefix) caddResult.chr = "chr" ~ caddResult.chr; 
+            if(
+                    caddResult.chr != rec.chrom ||
+                    caddResult.pos != rec.pos ||
+                    caddResult.refAllele != rec.refAllele ||
+                    caddResult.altAllele != rec.altAllelesAsArray[0]
+                    ){
+                vcfwriter.writeRecord(rec);
+                continue;
+            }
+            // check that we are doing things correctly
+            // TODO: Change to enforce for release checks?
+            assert(caddResult.chr == rec.chrom);
+            assert(caddResult.pos == rec.pos);
+            assert(caddResult.refAllele == rec.refAllele);
+            assert(caddResult.altAllele == rec.altAllelesAsArray[0]);
 
-			// check that we are doing things correctly
-			// TODO: Change to enforce for release checks?
-			assert(caddResult.chr == rec.chrom);
-			assert(caddResult.pos == rec.pos);
-			assert(caddResult.refAllele == rec.refAllele);
-			assert(caddResult.altAllele == rec.altAllelesAsArray[0]);
+            // TODO: Change to enforce for release checks
+            assert(rec.altAllelesAsArray.length == 1);
 
-			// TODO: Change to enforce for release checks
-			assert(rec.altAllelesAsArray.length == 1);
+            addINFOFields(rec, caddResult);
+            vcfwriter.writeRecord(rec);
 
-			addINFOFields(rec, caddResult);
-			vcfwriter.writeRecord(rec);
+        }else if(caddfields.length == 134){
+            // process caddline and fix prefix in cadd record
+            auto caddResult = processCADDLine!CADDAnnoExtended(caddfields);
+            caddResult.pos--;
+            if(prefix) caddResult.chr = "chr" ~ caddResult.chr; 
+            if(
+                    caddResult.chr != rec.chrom ||
+                    caddResult.pos != rec.pos ||
+                    caddResult.refAllele != rec.refAllele ||
+                    caddResult.altAllele != rec.altAllelesAsArray[0]
+                    ){
+                vcfwriter.writeRecord(rec);
+                continue;
+            }
+            // check that we are doing things correctly
+            // TODO: Change to enforce for release checks?
+            assert(caddResult.chr == rec.chrom);
+            assert(caddResult.pos == rec.pos);
+            assert(caddResult.refAllele == rec.refAllele);
+            assert(caddResult.altAllele == rec.altAllelesAsArray[0]);
 
-		}else if(caddfields.length == 134){
-			// process caddline and fix prefix in cadd record
-			auto caddResult = processCADDLine!CADDAnnoExtended(caddfields);
-			if(prefix) caddResult.chr = "chr" ~ caddResult.chr; 
+            // TODO: Change to enforce for release checks
+            assert(rec.altAllelesAsArray.length == 1);
 
-			// check that we are doing things correctly
-			// TODO: Change to enforce for release checks?
-			assert(caddResult.chr == rec.chrom);
-			assert(caddResult.pos == rec.pos);
-			assert(caddResult.refAllele == rec.refAllele);
-			assert(caddResult.altAllele == rec.altAllelesAsArray[0]);
+            addINFOFields(rec, caddResult);
+            vcfwriter.writeRecord(rec);
+        }else{
+            throw new Exception("malformed cadd line: " ~ caddline);
+        }
 
-			// TODO: Change to enforce for release checks
-			assert(rec.altAllelesAsArray.length == 1);
-
-			addINFOFields(rec, caddResult);
-			vcfwriter.writeRecord(rec);
-		}else{
-			throw new Exception("malformed cadd line: " ~ caddline);
-		}
-
-		// move caddfile range forward
-		caddfile.popFront;
-		caddline = caddfile.front;
-	}
+        // move caddfile range forward
+        caddfile.popFront;
+        caddEmpty = caddfile.empty;
+        caddline = caddfile.front;
+    }
 }
 
