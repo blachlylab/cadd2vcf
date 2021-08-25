@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/cadd2vcf
+cadd2vcf.so
+cadd2vcf.dylib
+cadd2vcf.dll
+cadd2vcf.a
+cadd2vcf.lib
+cadd2vcf-test-*
+*.exe
+*.o
+*.obj
+*.lst
