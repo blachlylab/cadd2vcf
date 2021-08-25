@@ -8,7 +8,8 @@ import dhtslib.vcf;
 import dhtslib.bgzf;
 import cadd;
 
-enum Build{
+enum Build
+{
     GRCh37,
     GRCh38
 }
